@@ -61,12 +61,12 @@ def horizontal_range(coord1,coord2)
   inc = (x1-x2)/(x1-x2).abs
 
   until x1 == x2
-    x_array << x2
     x2 += inc
+    x_array << x2
   end
 
   temp_arr = Array.new(x_array.length,coord1.first)
-  coord_arr = temp_arr.zip(x_array).push(coord1)
+  coord_arr = temp_arr.zip(x_array)
 end
 
 def vertical_range(coord1,coord2)
@@ -76,11 +76,11 @@ def vertical_range(coord1,coord2)
   inc = (y1-y2)/(y1-y2).abs
 
   until y1 == y2
-    y_array << y2
     y2 += inc
+    y_array << y2
   end
   temp_arr = Array.new(y_array.length,coord1.last)
-  coord_arr = y_array.zip(temp_arr).push(coord1)
+  coord_arr = y_array.zip(temp_arr)
 end
 
 def set_board(coord1,coord2,board,piece)
@@ -121,31 +121,30 @@ def place_ship(coord1,coord2,ship,board,ship_hash)
   check_dimension = check_dimension(coord1,coord2,ship,ship_hash)
   check_quantity = ship_hash[ship][1] > 0
   check_coord = (coord1+coord2).select {|i| i > 10}.count == 0
-
+  p coord1 #test
+  p coord2 #test
   selected_coord = []
-  # until total_num_quant(ship_hash) == 0
-    #see if it's possible: quantity > 0 and all coords are less than 10 and check_dimension
   if check_dimension && check_quantity && check_coord
-    #place ship
     case check_direction(coord1,coord2)
     when "horizontal"
+      # p 'asdasd' #test
       selected_coord = horizontal_range(coord1,coord2)
     when "vertical"
       selected_coord = vertical_range(coord1,coord2)
     else
       "try again"
     end#endCase
-    # ship_hash[ship][1] -= 1
   else
     "did not pass dimension, quantity and check coordinates"
     do_nothing
   end#endif
+
+  selected_coord
+
   if is_avail?(selected_coord,board)
     selected_coord.each do |coord|
       replace_empty(coord,board,"x")
     end#end selectedcoordloop
-
-  #reduce number of ship quantity
   ship_hash[ship][1] -= 1
   else
     "place again because there already a ship there"
@@ -167,7 +166,8 @@ def check_dimension(coord1,coord2,ship,hash)
   else
     called_size = 0
   end
-  return !!(hash[ship][0]==called_size+1)
+  # p called_size #test
+  return !!(hash[ship][0]==called_size)
 end
 
 def total_num_quant(hash)
@@ -185,11 +185,14 @@ def randomize_coord
   coord = [y,x]
 end
 
+#automate the board
 def generate_random_board(hash,board)
   coord1 = randomize_coord
   selected_coord = []
+  tries = 0
   # until quantity of total ships = 0
-  until total_num_quant(hash) == 0
+  until total_num_quant(hash) == 0 #|| tries > 500
+  coord1 = randomize_coord
   #   get random start coords
   #   is it available?
     until see_in_element(coord1,board) == '-'
@@ -202,37 +205,26 @@ def generate_random_board(hash,board)
           ship = choose_avail(hash).sample
   #       randomize horizontal or vertical
           direction = random_dir
-          direction = "horizontal" #test
+          # direction = "horizontal" #test
   #       if horizontal
   #       randomize to either add or minus
           operation = random_ops
-          operation = "minus" #test
+          # operation = "minus" #test
           if direction == "horizontal"
-  #         add or minus the size of the ship from x coord
             if operation == 'minus'
-              p xcoord2 = xcoord1 - hash[ship][0] - 1
+              xcoord2 = xcoord1 - hash[ship][0]
               xcoord2 = 0 if !check_boundary(xcoord2)
-              abort
             elsif operation == 'add'
-              xcoord2 = xcoord1 + hash[ship][0] - 1
+              xcoord2 = xcoord1 + hash[ship][0]
               xcoord2 = 0 if !check_boundary(xcoord2)
             end
             ycoord2 = ycoord1
-  #           store the value to the xcoord and maintain the same ycoord as random
-  #         else print out invalid
-  #       if vertical
-  #         randomize to either add or minus
-  #         add or minus the size of the ship from y coord
-  #         if answer is not greater than 10 or less than 0
-  #           store the value to the y coord and maintain the same xcoord as random
-  #         else
-  #           print out invalid
           elsif direction == "vertical"
             if operation == 'minus'
-              ycoord2 = ycoord1 - hash[ship][0] - 1
+              ycoord2 = ycoord1 - hash[ship][0]
               ycoord2 = 0 if !check_boundary(ycoord2)
             elsif operation == 'add'
-              ycoord2 = ycoord1 + hash[ship][0] - 1
+              ycoord2 = ycoord1 + hash[ship][0]
               ycoord2 = 0 if !check_boundary(ycoord2)
             end#endif
             xcoord2 = xcoord1
@@ -241,20 +233,13 @@ def generate_random_board(hash,board)
           end
   #     store new values
           coord2 = [ycoord2, xcoord2]
-
-          if coord2 != [0,0]
+          if !coord2.include?0
             place_ship(coord1,coord2,ship,board,hash)
           else
             do_nothing
           end
-  #     call the stored coordinates for starting point which was randomized and the guessed
-  #     if horizontal, pull horizontal range from stored coords
-  #     if vertical, pull the vertical range from stored coords
-  #     use is_avail to check if its valid
-  #     if so, use place_ship
-  #     else do nothing
-
-  # ENDUNTIL
+  tries += 1
+  puts "quantity"
   p total_num_quant(hash)
   end#enduntil
 end
@@ -298,6 +283,9 @@ board = generate_board(10,10)
 # format_board(board)
 generate_random_board(ship_hash,board)
 format_board(board)
+
+
+# p ship_hash
 # p coord = randomize_coord
 # p see_in_element(coord,board)
 # p choose_avail(ship_hash).sample
