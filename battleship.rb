@@ -18,11 +18,16 @@ def generate_board(y,x)
 end
 
 def format_board(board)
+  puts "      A  B  C  D  E  F  G  H  I  J"
+  i =1
   board.each do |row|
+    print " #{i} | " if i < 10
+    print " #{i}| " if 10 == i
     row.each do |e|
       print " #{e} "
     end#endrowloop
     puts ""
+    i += 1
   end#endboardloop
 end
 
@@ -143,7 +148,7 @@ def place_ship(coord1,coord2,ship,board,ship_hash)
 
   if is_avail?(selected_coord,board)
     selected_coord.each do |coord|
-      replace_empty(coord,board,"x")
+      replace_empty(coord,board,ship[0])
     end#end selectedcoordloop
   ship_hash[ship][1] -= 1
   else
@@ -274,7 +279,7 @@ end
 ship_hash ={
             "Carrier" => [5, 1],
             "Battleship" => [4, 1],
-            "Cruiser" => [3, 1],
+            "cruiser" => [3, 1],
             "Destroyer" => [2, 2],
             "Submarine" => [1, 2],
             }
