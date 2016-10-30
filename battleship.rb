@@ -1,3 +1,8 @@
+#globalvariable
+@g_array = []
+
+
+
 # Your code here
 def generate_board(y,x)
   # horizontal_len = Array.new(x, '-')
@@ -122,12 +127,14 @@ def is_avail?(coord_array,board)
   status
 end
 
+
 def place_ship(coord1,coord2,ship,board,ship_hash)
+  # arr = [] #testing
   check_dimension = check_dimension(coord1,coord2,ship,ship_hash)
   check_quantity = ship_hash[ship][1] > 0
   check_coord = (coord1+coord2).select {|i| i > 10}.count == 0
-  p coord1 #test
-  p coord2 #test
+  # p coord1 #test
+  # p coord2 #test
   selected_coord = []
   if check_dimension && check_quantity && check_coord
     case check_direction(coord1,coord2)
@@ -147,6 +154,7 @@ def place_ship(coord1,coord2,ship,board,ship_hash)
   selected_coord
 
   if is_avail?(selected_coord,board)
+    store_array_for_later(selected_coord)#testing
     selected_coord.each do |coord|
       replace_empty(coord,board,ship[0])
     end#end selectedcoordloop
@@ -155,6 +163,40 @@ def place_ship(coord1,coord2,ship,board,ship_hash)
     "place again because there already a ship there"
     do_nothing
   end
+end
+
+#this would store all the coordinate ranges for later tracking
+def store_array_for_later(array)
+  @g_array << array #globalvariable
+end
+
+#spits out the game tracker in the beginning
+#use this to keep track of how the player is doing
+def beginning_tracker
+  #[[g_array],[size],[name],[status],[count]]
+  track_arr = [
+                [[],[5],["Carrier"],["A"],[0]],
+                [[],[4],["Battleship"],["A"],[0]],
+                [[],[3],["cruiser"],["A"],[0]],
+                [[],[2],["Destroyer"],["A"],[0]],
+                [[],[2],["Destroyer"],["A"],[0]],
+                [[],[1],["Submarine"],["A"],[0]],
+                [[],[1],["Submarine"],["A"],[0]]
+              ]
+  used_arrays = []
+  @g_array.each do |array_range|
+    track_arr.each do |sets|
+      # p array_range.length
+      # p sets[1][0]
+      if array_range.length == sets[1][0] && sets[0].empty? && !used_arrays.include?(array_range)
+        sets[0] = array_range
+        used_arrays << array_range
+      else
+        do_nothing
+      end#end if
+    end#end track_arr loop
+  end#end g_arry loop
+  track_arr
 end
 
 def check_dimension(coord1,coord2,ship,hash)
@@ -195,26 +237,17 @@ def generate_random_board(hash,board)
   coord1 = randomize_coord
   selected_coord = []
   tries = 0
-  # until quantity of total ships = 0
+
   until total_num_quant(hash) == 0 #|| tries > 500
   coord1 = randomize_coord
-  #   get random start coords
-  #   is it available?
     until see_in_element(coord1,board) == '-'
       coord1 = randomize_coord
     end#enduntil
           ycoord1 = coord1.first
           xcoord1 = coord1.last
-  #     if it is:
-  #       randomize ship, which must have a quantity greater than 0
           ship = choose_avail(hash).sample
-  #       randomize horizontal or vertical
           direction = random_dir
-          # direction = "horizontal" #test
-  #       if horizontal
-  #       randomize to either add or minus
           operation = random_ops
-          # operation = "minus" #test
           if direction == "horizontal"
             if operation == 'minus'
               xcoord2 = xcoord1 - hash[ship][0]
@@ -244,8 +277,7 @@ def generate_random_board(hash,board)
             do_nothing
           end
   tries += 1
-  puts "quantity"
-  p total_num_quant(hash)
+  total_num_quant(hash)
   end#enduntil
 end
 
@@ -275,6 +307,39 @@ def choose_avail(hash)
 end
 
 #-------------------------------------------
+
+# def create_tracker_hash(hash)
+#   #hash: coord_range, size, status
+#   tracker_hash ={
+#     "Carrier" => [[],[hash["Carrier"][0]],["A"]],
+#     "Battleship" => [[],[hash["Battleship"][0]],["A"]],
+#     "cruiser" => [[],[hash["cruiser"][0]],["A"]],
+#     "Destroyer" => [[],[hash["Destroyer"][0]],["A"]],
+#     "Submarine" => [[],[hash["Submarine"][0]],["A"]]
+#   }
+#   @g_array.each do |array_range|
+#     case array_range.count
+#     when 5
+#       tracker_hash["Carrier"][0] = array_range
+#     when 4
+#   end
+#   tracker_hash
+# end
+
+#scan the board and collect all the ships into their own array or hash, store coordinates
+# key: letter of ship
+# 1st array: store the coordinates
+# 2nd array: size of the ship
+# # Not yet!!! 3rd array: count how many times the array has been hit or been called
+# #   if the person hits any coordinate in the array, increase count to one
+# #   and compare it to the
+# 3rd array: call status (active or sunk)
+#
+#
+# #after every hit
+# check the stored coordinates and if they are all x then change status to sunk
+
+
 #name, size, quantity
 ship_hash ={
             "Carrier" => [5, 1],
@@ -287,6 +352,8 @@ ship_hash ={
 board = generate_board(10,10)
 # format_board(board)
 generate_random_board(ship_hash,board)
+# p @g_array
+p beginning_tracker
 format_board(board)
 
 
