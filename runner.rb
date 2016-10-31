@@ -105,7 +105,7 @@ else
   puts "Wrong, computer goes first"
 end
 
-# if result == user_choice
+if result == user_choice
 
   beat_user = false
   beat_computer = false
@@ -136,6 +136,7 @@ end
     end#enduntil
     user_shot_hist << user_call
     ship_sunk(computer_tracker,"user")
+    puts "Your shot history #{user_shot_hist}"
     if finished?(computer_tracker)
       beat_computer = true
       puts "Congratulations!! You Won!!!"
@@ -164,40 +165,58 @@ end
     puts "Computer move --------------------------------------------"
   end#end generall loop
 
-# else
-#
-#   beat_user = false
-#   beat_computer = false
-#
-#   until beat_user || beat_computer
-#     #computer turn
-#     valid_counter_comp = 0
-#     until valid_counter > 0
-#       computer_shot = coord_translater(coord_generation_randomly)
-#       shoot(computer_shot,user_board,user_tracker,"computer")
-#       valid_counter_comp += 1 if valid_shot?(computer_shot,user_board)
-#     end#enduntil
-#     ship_sunk(user_tracker,"computer")
-#     beat_user = true if finished?(user_tracker)
-#     puts "Your current position"
-#     spit_out_progress if !finished?(user_tracker)
-#
-#       #user turn
-#     puts "Computer board:" if display
-#     format_board(computer_board) if display
-#     puts "Where do you want to fire?"
-#     valid_counter = 0
-#     until valid_counter > 0
-#       user_call = gets.chomp
-#       user_shot = coord_translater(user_call)
-#       shoot(user_shot,computer_board,computer_tracker,"user")
-#       valid_counter += 1 if valid_shot?(user_shot,computer_board)
-#       puts "You already shot that!" if valid_counter == 0
-#     end#enduntil
-#     user_shot_hist << user_call
-#     ship_sunk(computer_tracker,"user")
-#     beat_computer = true if finished?(computer_tracker)
-#     spit_out_progress if !finished?(computer_tracker)
-#   end#end generall loop
-#
-# end#endif who goes first
+else
+
+  until beat_user || beat_computer
+    #computer turn
+    puts "Computer move --------------------------------------------"
+    valid_counter_comp = 0
+    until valid_counter_comp > 0
+      computer_call = coord_generation_randomly
+      computer_shot = coord_translater(computer_call)
+      valid_counter_comp += 1 if valid_shot?(computer_shot,user_board) && !computer_shot_hist.include?(computer_call)
+      shoot(computer_shot,user_board,user_tracker,"computer")
+    end#enduntil
+    computer_shot_hist << computer_call
+    ship_sunk(user_tracker,"computer")
+    if finished?(user_tracker)
+      beat_user = true
+      puts "Boo.... You Lost..."
+      break
+    end
+    puts "Your board:"
+    format_board(user_board) if !finished?(user_tracker)
+    puts "Computer move --------------------------------------------"
+
+
+    #user turn
+    puts "Computer board:" if display
+    format_board(computer_board) if display
+    puts "Where do you want to fire?"
+    valid_counter = 0
+    until valid_counter > 0
+      user_valid = 0
+      until user_valid > 0
+        user_call = gets.chomp
+        user_valid += 1 if valid_call?(user_call)
+      end
+      user_shot = coord_translater(user_call)
+      valid_counter += 1 if valid_shot?(user_shot,computer_board)
+      shoot(user_shot,computer_board,computer_tracker,"user")
+      # if valid_shot?(user_shot,computer_board)
+      puts "You already shot that!" if valid_counter == 0
+      # puts "Computer board:" if display
+      # format_board(computer_board) if display
+    end#enduntil
+    user_shot_hist << user_call
+    ship_sunk(computer_tracker,"user")
+    puts "Your shot history #{user_shot_hist}"
+    if finished?(computer_tracker)
+      beat_computer = true
+      puts "Congratulations!! You Won!!!"
+      break
+    end
+    sleep(2.0)
+
+  end#end generall loop
+end#endif who goes first
