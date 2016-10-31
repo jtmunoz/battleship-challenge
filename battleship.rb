@@ -1,10 +1,11 @@
 #globalvariable
 @g_array = []
+@g_array_user = []
 
 
 
 # Your code here
-def generate_board(y,x)
+def generate_board
   # horizontal_len = Array.new(x, '-')
   # horizontal_len = Array.new(x){[1,2,3,4,5,6,7].sample}
   # board = Array.new(y){horizontal_len}
@@ -55,6 +56,8 @@ end
 
 def check_direction(coord1,coord2)
   case
+  when coord1 == coord2
+    return "standalone"
   when coord1.last == coord2.last
     return "vertical"
   when coord1.first == coord2.first
@@ -76,7 +79,7 @@ def horizontal_range(coord1,coord2)
   end
 
   temp_arr = Array.new(x_array.length,coord1.first)
-  coord_arr = temp_arr.zip(x_array)
+  coord_arr = temp_arr.zip(x_array).push(coord2)
 end
 
 def vertical_range(coord1,coord2)
@@ -89,13 +92,16 @@ def vertical_range(coord1,coord2)
     y2 += inc
     y_array << y2
   end
+
   temp_arr = Array.new(y_array.length,coord1.last)
-  coord_arr = y_array.zip(temp_arr)
+  coord_arr = y_array.zip(temp_arr).push(coord2)
 end
 
 def set_board(coord1,coord2,board,piece)
   coord_arr = []
   case check_direction(coord1,coord2)
+    when "standalone"
+      coord_arr = [coord1,coord2]
     when "horizontal"
       coord_arr = horizontal_range(coord1,coord2)
     when "vertical"
@@ -106,6 +112,99 @@ def set_board(coord1,coord2,board,piece)
 
   coord_arr.each do |coord|
     replace_empty(coord,board,piece)
+  end
+end
+
+def shoot(coord,board,g_array)
+  element = see_in_element(coord,board)
+  if element == '-'
+    replace_empty(coord,board,'/')
+    puts 'Miss'
+  elsif element == 'X'
+    puts 'Invalid input, try again'
+  else
+    replace_empty(coord,board,'X')
+    update_tracker(coord,g_array)
+    puts 'You just hit a ship!'
+  end
+end
+
+def ship_sunk(g_array)
+  g_array.each do |arr|
+    if arr[3][0] == 'A' && arr[0].length == arr[4][0]
+      arr[3][0] == 'S'
+      puts "Great, you just sunk #{arr[2][0]}"
+    else
+      do_nothing
+    end#endif
+  end#endg_array loop
+end
+
+def ship_valid?(hash,ship_input)
+  hash.has_key?(ship_input)
+end
+
+def finished?(g_array)
+  collect_status = []
+  g_array.each do |arr|
+     collect_status << arr[3][0]
+  end
+  !!(!collect_status.include('A'))
+end
+
+def spit_out_progress(hash)
+  hash.each do |ship,info|
+    puts "Ship: #{ship}"
+    puts "      Size: #{info[0]}"
+    puts "  Quantity: #{info[1]}"
+  end
+end
+
+def ship_avail?(ship,hash)
+  avail = true
+  avail = false if hash[ship][1] < 1
+  avail
+end
+
+def finished_manual_input?(hash)
+  total_quant = []
+
+  hash.each do |ship,info|
+    total_quant << info[1]
+  end
+  !!(total_quant.inject(0,:+)==0)
+end
+
+def coord_translater(call)
+  #user inputs i.g. A3; A = X-coord 3 = Y-coord
+  translate_hash = {
+    "A" => 1,
+    "B" => 2,
+    "C" => 3,
+    "D" => 4,
+    "E" => 5,
+    "F" => 6,
+    "G" => 7,
+    "H" => 8,
+    "I" => 9,
+    "J" => 10
+  }
+  xcoord = translate_hash[call[0].upcase]
+
+  ycoord = call[1..10].to_i
+  return [ycoord,xcoord]
+end
+
+#loop until available
+def coord_generation_randomly
+  xcoord = ["A","B","C","D","E","F","G","H","I","J"].sample
+  ycoord = rand(10) + 1
+  return "#{xcoord}#{ycoord}"
+end
+
+def update_tracker(coord,global_array)
+  global_array.each do |arr|
+    arr[4][0] += 1 if arr[0].include?(coord)
   end
 end
 
@@ -128,7 +227,7 @@ def is_avail?(coord_array,board)
 end
 
 
-def place_ship(coord1,coord2,ship,board,ship_hash)
+def place_ship(coord1,coord2,ship,board,ship_hash,user) #defineuser
   # arr = [] #testing
   check_dimension = check_dimension(coord1,coord2,ship,ship_hash)
   check_quantity = ship_hash[ship][1] > 0
@@ -138,41 +237,43 @@ def place_ship(coord1,coord2,ship,board,ship_hash)
   selected_coord = []
   if check_dimension && check_quantity && check_coord
     case check_direction(coord1,coord2)
+    when "standalone"
+      selected_coord = [coord1,coord2]
     when "horizontal"
       # p 'asdasd' #test
       selected_coord = horizontal_range(coord1,coord2)
     when "vertical"
       selected_coord = vertical_range(coord1,coord2)
     else
-      "try again"
+      puts "It needs to be either horizontal or vertical"
     end#endCase
   else
-    "did not pass dimension, quantity and check coordinates"
+    puts "Somethings wrong with your input, try again"
     do_nothing
   end#endif
-
   selected_coord
 
   if is_avail?(selected_coord,board)
-    store_array_for_later(selected_coord)#testing
+    store_array_for_later(selected_coord,user)
     selected_coord.each do |coord|
       replace_empty(coord,board,ship[0])
     end#end selectedcoordloop
-  ship_hash[ship][1] -= 1
+    ship_hash[ship][1] -= 1 if !selected_coord.empty?
   else
-    "place again because there already a ship there"
+    puts "There's already a ship there" if user != "computer"
     do_nothing
-  end
+  end#endif
 end
 
 #this would store all the coordinate ranges for later tracking
-def store_array_for_later(array)
-  @g_array << array #globalvariable
+def store_array_for_later(array,user)#defineuser
+  return @g_array << array if user == "computer" #globalvariable
+  return @g_array_user << array if user == "user"
 end
 
 #spits out the game tracker in the beginning
 #use this to keep track of how the player is doing
-def beginning_tracker
+def beginning_tracker(user)#defineuser
   #[[g_array],[size],[name],[status],[count]]
   track_arr = [
                 [[],[5],["Carrier"],["A"],[0]],
@@ -184,18 +285,33 @@ def beginning_tracker
                 [[],[1],["Submarine"],["A"],[0]]
               ]
   used_arrays = []
-  @g_array.each do |array_range|
-    track_arr.each do |sets|
-      # p array_range.length
-      # p sets[1][0]
-      if array_range.length == sets[1][0] && sets[0].empty? && !used_arrays.include?(array_range)
-        sets[0] = array_range
-        used_arrays << array_range
-      else
-        do_nothing
-      end#end if
-    end#end track_arr loop
-  end#end g_arry loop
+  if user == "computer"
+    @g_array.each do |array_range|
+      track_arr.each do |sets|
+        # p array_range.length
+        # p sets[1][0]
+        if array_range.length == sets[1][0] && sets[0].empty? && !used_arrays.include?(array_range)
+          sets[0] = array_range
+          used_arrays << array_range
+        else
+          do_nothing
+        end#end if
+      end#end track_arr loop
+    end#end g_arry loop
+  elsif user == "user"
+    @g_array_user.each do |array_range|
+      track_arr.each do |sets|
+        # p array_range.length
+        # p sets[1][0]
+        if array_range.length == sets[1][0] && sets[0].empty? && !used_arrays.include?(array_range)
+          sets[0] = array_range
+          used_arrays << array_range
+        else
+          do_nothing
+        end#end if
+      end#end track_arr loop
+    end#end g_arry loop
+  end#endifuser
   track_arr
 end
 
@@ -206,15 +322,22 @@ def check_dimension(coord1,coord2,ship,hash)
       #if try again, set check_dimension to false
   called_size = 0
   case check_direction(coord1,coord2)
+  when "standalone"
+    called_size = 1
   when "horizontal"
-    called_size = (coord1.last - coord2.last).abs
+    called_size = (coord1.last - coord2.last).abs + 1
   when "vertical"
-    called_size = (coord1.first - coord2.first).abs
+    called_size = (coord1.first - coord2.first).abs + 1
   else
     called_size = 0
   end
   # p called_size #test
-  return !!(hash[ship][0]==called_size)
+  if hash[ship][0]==called_size
+    return true
+  else
+    puts "There's an issue with your dimension"
+    return false
+  end
 end
 
 def total_num_quant(hash)
@@ -233,7 +356,7 @@ def randomize_coord
 end
 
 #automate the board
-def generate_random_board(hash,board)
+def generate_random_board(hash,board,user) #defineuser
   coord1 = randomize_coord
   selected_coord = []
   tries = 0
@@ -246,33 +369,44 @@ def generate_random_board(hash,board)
           ycoord1 = coord1.first
           xcoord1 = coord1.last
           ship = choose_avail(hash).sample
-          direction = random_dir
+
+          if ship != "Submarine"
+            direction = random_dir
+          else
+            direction = "standalone"
+          end#endshipif Submarine
           operation = random_ops
-          if direction == "horizontal"
-            if operation == 'minus'
-              xcoord2 = xcoord1 - hash[ship][0]
-              xcoord2 = 0 if !check_boundary(xcoord2)
-            elsif operation == 'add'
-              xcoord2 = xcoord1 + hash[ship][0]
-              xcoord2 = 0 if !check_boundary(xcoord2)
+
+          if direction != "standalone"
+            if direction == "horizontal"
+              if operation == 'minus'
+                xcoord2 = xcoord1 - hash[ship][0] + 1
+                xcoord2 = 0 if !check_boundary(xcoord2)
+              elsif operation == 'add'
+                xcoord2 = xcoord1 + hash[ship][0] - 1
+                xcoord2 = 0 if !check_boundary(xcoord2)
+              end
+              ycoord2 = ycoord1
+            elsif direction == "vertical"
+              if operation == 'minus'
+                ycoord2 = ycoord1 - hash[ship][0] + 1
+                ycoord2 = 0 if !check_boundary(ycoord2)
+              elsif operation == 'add'
+                ycoord2 = ycoord1 + hash[ship][0] - 1
+                ycoord2 = 0 if !check_boundary(ycoord2)
+              end#endif
+              xcoord2 = xcoord1
+            else#endsbigif
+              do_nothing
             end
+          else#elsestandalone
             ycoord2 = ycoord1
-          elsif direction == "vertical"
-            if operation == 'minus'
-              ycoord2 = ycoord1 - hash[ship][0]
-              ycoord2 = 0 if !check_boundary(ycoord2)
-            elsif operation == 'add'
-              ycoord2 = ycoord1 + hash[ship][0]
-              ycoord2 = 0 if !check_boundary(ycoord2)
-            end#endif
             xcoord2 = xcoord1
-          else#endsbigif
-            do_nothing
-          end
-  #     store new values
+          end#endifstandalone
+          #store new values
           coord2 = [ycoord2, xcoord2]
           if !coord2.include?0
-            place_ship(coord1,coord2,ship,board,hash)
+            place_ship(coord1,coord2,ship,board,hash,user)
           else
             do_nothing
           end
@@ -308,37 +442,6 @@ end
 
 #-------------------------------------------
 
-# def create_tracker_hash(hash)
-#   #hash: coord_range, size, status
-#   tracker_hash ={
-#     "Carrier" => [[],[hash["Carrier"][0]],["A"]],
-#     "Battleship" => [[],[hash["Battleship"][0]],["A"]],
-#     "cruiser" => [[],[hash["cruiser"][0]],["A"]],
-#     "Destroyer" => [[],[hash["Destroyer"][0]],["A"]],
-#     "Submarine" => [[],[hash["Submarine"][0]],["A"]]
-#   }
-#   @g_array.each do |array_range|
-#     case array_range.count
-#     when 5
-#       tracker_hash["Carrier"][0] = array_range
-#     when 4
-#   end
-#   tracker_hash
-# end
-
-#scan the board and collect all the ships into their own array or hash, store coordinates
-# key: letter of ship
-# 1st array: store the coordinates
-# 2nd array: size of the ship
-# # Not yet!!! 3rd array: count how many times the array has been hit or been called
-# #   if the person hits any coordinate in the array, increase count to one
-# #   and compare it to the
-# 3rd array: call status (active or sunk)
-#
-#
-# #after every hit
-# check the stored coordinates and if they are all x then change status to sunk
-
 
 #name, size, quantity
 ship_hash ={
@@ -349,14 +452,17 @@ ship_hash ={
             "Submarine" => [1, 2],
             }
 
-board = generate_board(10,10)
+# p ship_valid?(ship_hash,"")
+# board = generate_board
 # format_board(board)
-generate_random_board(ship_hash,board)
+# p finished_manual_input?(ship_hash)
+# generate_random_board(ship_hash,board)
+# p finished_manual_input?(ship_hash)
 # p @g_array
-p beginning_tracker
-format_board(board)
-
-
+# beginning_tracker
+# format_board(board)
+# p see_in_element([2,4],board)
+# p spit_out_progress(ship_hash)
 # p ship_hash
 # p coord = randomize_coord
 # p see_in_element(coord,board)
