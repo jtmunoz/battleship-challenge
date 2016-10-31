@@ -55,6 +55,25 @@ def convert_user_board(board)
   user_board
 end
 
+# Convert Opponent Board
+# Input: Opponent Board
+# Output: User-friendly Opponent Board
+def convert_opponent_board(board)
+  opponent_board = generate_board
+  board.each.with_index do |row, row_index|
+    row.map.with_index do |cell, col_index|
+      case cell
+      when 1 then new_cell = "/"
+      when 2 then new_cell = "x"
+      else new_cell = " "
+      end
+      opponent_board[row_index][col_index] = new_cell
+    end
+  end
+
+  opponent_board
+end
+
 # Print GameBoard
 # Input: A game board
 def display_board(board)
@@ -119,19 +138,29 @@ def indexes_valid?(indexes, board)
   !invalid
 end
 
+# Ship Key
+def ship_key
+  { carrier:     3,
+    battleship:  4,
+    cruiser:     5,
+    destroyer_1: 6,
+    destroyer_2: 7,
+    submarine_1: 8,
+    submarine_2: 9 }
+end
+
 # Get Ship Code
 # Input: ship_type(symbol)
 # Output: ship_code
 def get_ship_code(ship_type)
-  case ship_type
-  when :carrier     then ship_code = 3
-  when :battleship  then ship_code = 4
-  when :cruiser     then ship_code = 5
-  when :destroyer_1 then ship_code = 6
-  when :destroyer_2 then ship_code = 7
-  when :submarine_1 then ship_code = 8
-  when :submarine_2 then ship_code = 9
-  end
+  ship_key[ship_type]
+end
+
+# Get Ship Type
+# Input: ship_code
+# Output: ship_type
+def get_ship_type(ship_code)
+  ship_key.key(ship_code)
 end
 
 # Place Ship On Board
@@ -147,6 +176,39 @@ def place_ship(ship_type, indexes, board)
   end
 end
 
+# Check if Ship is Hit
+# Input: an index, a board
+# Output: ship if hit | false if missed | true if place shot before
+def ship_hit?(index, board)
+  row_index = index[0]
+  col_index = index[1]
+  cell = board[row_index][col_index]
+
+  return false if cell == 0
+  return true if (cell == 1) || (cell == 2)
+  get_ship_type(cell)
+end
+
+# Record Shot
+# Input: player_ship_info, index, board
+def record_shot(ships, index, board)
+  row_index = index[0]
+  col_index = index[1]
+  shot = ship_hit?(index, board)
+  if shot == false
+    board[row_index][col_index] = 1
+  else
+    board[row_index][col_index] = 2
+    ships[shot] -= 1
+  end
+end
+
+# Check if Ship is Sunk
+# Input: player's ship information
+# Output: true | false
+def ship_sunk?(ships, ship)
+  ships[ship] == 0
+end
 
 
 
