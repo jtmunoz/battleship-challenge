@@ -109,31 +109,44 @@ def set_board(coord1,coord2,board,piece)
     else
         "try again"
   end #endcase
-
   coord_arr.each do |coord|
     replace_empty(coord,board,piece)
   end
 end
 
-def shoot(coord,board,g_array)
+def valid_shot?(coord,board)
+  valid = true
+  element = see_in_element(coord,board)
+  valid = false if element == 'X' || element == '/'
+  valid
+end
+
+def shoot(coord,board,g_array,user)
+  # p coord
   element = see_in_element(coord,board)
   if element == '-'
     replace_empty(coord,board,'/')
-    puts 'Miss'
+    puts 'Missed'
   elsif element == 'X'
-    puts 'Invalid input, try again'
+    puts 'Invalid input, try again' if user == "user"
   else
     replace_empty(coord,board,'X')
     update_tracker(coord,g_array)
-    puts 'You just hit a ship!'
+    puts 'You just hit a ship!'if user == "user"
+    puts 'Your ship just got hit!' if user == "computer"
   end
 end
 
-def ship_sunk(g_array)
+def ship_sunk(g_array,user)
   g_array.each do |arr|
     if arr[3][0] == 'A' && arr[0].length == arr[4][0]
-      arr[3][0] == 'S'
-      puts "Great, you just sunk #{arr[2][0]}"
+      arr[3][0] = 'S'
+      puts "Great, you just sank #{arr[2][0]}" if user == "user"
+      puts "Oh no, your #{arr[2][0]} just sank..." if user == "computer"
+    elsif arr[3][0] == 'A' && arr[2][0] == "Submarine" && arr[4][0] == 1
+      arr[3][0] = 'S'
+      puts "Great, you just sank #{arr[2][0]}" if user == "user"
+      puts "Oh no, your #{arr[2][0]} just sank..." if user == "computer"
     else
       do_nothing
     end#endif
@@ -144,12 +157,41 @@ def ship_valid?(hash,ship_input)
   hash.has_key?(ship_input)
 end
 
+def valid_call?(call)
+  hash = {
+    "A" => 1,
+    "B" => 2,
+    "C" => 3,
+    "D" => 4,
+    "E" => 5,
+    "F" => 6,
+    "G" => 7,
+    "H" => 8,
+    "I" => 9,
+    "J" => 10
+  }
+
+  if hash.has_key?(call[0].upcase) && hash.has_value?(call[1..2].to_i)
+    return true
+  else
+    return false
+  end
+end
+
+
+
 def finished?(g_array)
   collect_status = []
+
   g_array.each do |arr|
      collect_status << arr[3][0]
   end
-  !!(!collect_status.include('A'))
+
+  if collect_status.include?('A')
+    return false
+  else
+    return true
+  end
 end
 
 def spit_out_progress(hash)
@@ -265,6 +307,11 @@ def place_ship(coord1,coord2,ship,board,ship_hash,user) #defineuser
   end#endif
 end
 
+def heads_or_tails
+  result = ['heads','tails'].sample
+  result
+end
+
 #this would store all the coordinate ranges for later tracking
 def store_array_for_later(array,user)#defineuser
   return @g_array << array if user == "computer" #globalvariable
@@ -286,11 +333,21 @@ def beginning_tracker(user)#defineuser
               ]
   used_arrays = []
   if user == "computer"
+
     @g_array.each do |array_range|
+      # puts  " array range: #{array_range}"
       track_arr.each do |sets|
         # p array_range.length
         # p sets[1][0]
-        if array_range.length == sets[1][0] && sets[0].empty? && !used_arrays.include?(array_range)
+        if array_range.length == 2 && array_range[0] == array_range[1]
+          if track_arr[5][0].empty?
+            track_arr[5][0] = array_range
+            used_arrays << array_range
+          else
+            track_arr[6][0] = array_range
+            used_arrays << array_range
+          end
+        elsif array_range.length == sets[1][0] && sets[0].empty? && !used_arrays.include?(array_range)
           sets[0] = array_range
           used_arrays << array_range
         else
@@ -298,12 +355,23 @@ def beginning_tracker(user)#defineuser
         end#end if
       end#end track_arr loop
     end#end g_arry loop
+
   elsif user == "user"
+
     @g_array_user.each do |array_range|
+      # puts  " array range: #{array_range}"
       track_arr.each do |sets|
         # p array_range.length
         # p sets[1][0]
-        if array_range.length == sets[1][0] && sets[0].empty? && !used_arrays.include?(array_range)
+        if array_range.length == 2 && array_range[0] == array_range[1]
+          if track_arr[5][0].empty?
+            track_arr[5][0] = array_range
+            used_arrays << array_range
+          else
+            track_arr[6][0] = array_range
+            used_arrays << array_range
+          end
+        elsif array_range.length == sets[1][0] && sets[0].empty? && !used_arrays.include?(array_range)
           sets[0] = array_range
           used_arrays << array_range
         else
@@ -311,7 +379,9 @@ def beginning_tracker(user)#defineuser
         end#end if
       end#end track_arr loop
     end#end g_arry loop
+
   end#endifuser
+
   track_arr
 end
 
