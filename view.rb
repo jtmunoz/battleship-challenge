@@ -20,19 +20,29 @@ class View
 		if intro_screen_input == 'q'
 			puts "\n\nSEE YOU NEXT TIME"
 		elsif intro_screen_input == '2'
-			puts "MULTIPLAYER IS NOT YET SUPPORTED"
+			puts "\n\n\n\n\n********************************************"
+			puts "***** MULTIPLAYER IS NOT YET SUPPORTED *****"
+			puts "********************************************"
 		else
-			puts "PLEASE ENTER A VALID OPTION"
+			puts "\n\n\n\n\n***************************************"
+			puts "***** PLEASE ENTER A VALID OPTION *****"
+			puts "***************************************"
 		end
 	end
 
 	def give_user_instructions
 		puts "\n\n\nPLEASE ENTER A COLUMN AND ROW IN THE FORM OF 'D7' \nIN ORDER TO SHOOT AT YOUR OPPONENT\n\n\n"
+		puts "GAME STARTING IN 5 SECONDS"
+		sleep(5)
 	end
 
 	def get_user_shot
 		puts "\nENTER A COORDINATE CAPTAIN:"
 		user_shot = gets.chomp.downcase
+	end
+
+	def notify_computers_turn
+		puts "\nCOMPUTER'S TURN:"
 	end
 
 	def show_boards(user_gameboard, computer_gameboard)
@@ -43,4 +53,49 @@ class View
 		computer_gameboard.show_hidden_board
 	end
 
+	def sink_message(ship)
+		puts "\n***************************************"
+		puts "#@@@@@@ YOU SUNK THE COMPUTER'S #{ship.name.upcase}!!! @@@@@@"
+		puts "***************************************"
+		sleep(3)
+	end
+
+	def computer_sink_message(ship)
+		puts "\n***************************************"
+		puts "#@@@@@@ THE COMPUTER SANK YOUR #{ship.name.upcase}!!! @@@@@@"
+		puts "***************************************"
+		sleep(3)
+	end
+
+	def user_wins
+		10.times {puts "\n"}
+		10.times {puts "***************************************"}
+		2.times  {puts "*********                     *********"}
+		puts           "*********       YOU WIN!      *********"
+		2.times  {puts "*********                     *********"}
+		10.times {puts "***************************************"}
+	end
+
+		def computer_wins
+		10.times {puts "\n"}
+		10.times {puts "***************************************"}
+		2.times  {puts "*********                     *********"}
+		puts           "*********    COMPUTER WINS!   *********"
+		2.times  {puts "*********                     *********"}
+		10.times {puts "***************************************"}
+	end
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+

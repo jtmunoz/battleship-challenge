@@ -11,14 +11,13 @@ class Ship
 
 	def hit
 		self.times_hit += 1
+		if times_hit >= size
+			self.is_sunk = true
+		end
 	end
 
 	def is_sunk?
-		if times_hit >= size
-			self.is_sunk = true
-		else
-			return false
-		end
+		return self.is_sunk
 	end
 
 end

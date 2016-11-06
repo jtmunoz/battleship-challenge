@@ -27,7 +27,7 @@ class Gameboard
 	end
 
 	def show_hidden_spots
-		@taken_positions.flatten!.each do |position|
+		@taken_positions.each do |position| #removed flatten!
 			if position.to_s.length > 1
 				self.hidden_board[position.to_s[0].to_i][position.to_s[1].to_i] = "X"
 			else
@@ -75,6 +75,7 @@ class Gameboard
 		end
 		# p "spots array after do #{spots_array}"
 		ship.position = spots_array
+		taken_positions.flatten!
 		# p @taken_positions
 		return spots_array
 	end
@@ -111,6 +112,7 @@ class Gameboard
 		end
 		# p "spots array after do #{spots_array}"
 		ship.position = spots_array
+		taken_positions.flatten!
 		# @taken_positions << spots_array
 		# p @taken_positions
 		return spots_array
@@ -129,16 +131,32 @@ class Gameboard
 	def show_hidden_board
 		# show_hidden_spots #shows hidden spots on board - use for debugging
 		puts "   A  B  C  D  E  F  G  H  I  J"
-		@hidden_board.each_with_index do |row, index|
+		@board.each_with_index do |row, index|
 			puts "#{index}  #{row.join('  ')}"
 		end
 	end
 
 	def show_revealed_board
-		show_hidden_spots #shows hidden spots on board - use for debugging
+		show_hidden_spots
 		puts "   A  B  C  D  E  F  G  H  I  J"
 		@hidden_board.each_with_index do |row, index|
 			puts "#{index}  #{row.join('  ')}"
+		end
+	end
+
+	def hit(coordinate)
+		if coordinate.to_s.length > 1
+			self.board[coordinate.to_s[0].to_i][coordinate.to_s[1].to_i] = "X"
+		else
+			self.board[0][coordinate] = "X"
+		end
+	end
+
+	def miss(coordinate)
+		if coordinate.to_s.length > 1
+			self.board[coordinate.to_s[0].to_i][coordinate.to_s[1].to_i] = "/"
+		else
+			self.board[0][coordinate] = "/"
 		end
 	end
 
