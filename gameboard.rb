@@ -3,7 +3,6 @@ require_relative 'fleet'
 class Gameboard
 
 	attr_accessor :board, :hidden_board, :fleet, :taken_positions
-	attr_reader :sub_1_pos, :sub_2_pos
 
 	def initialize(fleet)
 		@fleet = fleet
@@ -12,6 +11,7 @@ class Gameboard
 		@taken_positions = Array.new
 		self.create_board
 		self.create_hidden_board
+		self.position_ships
 	end
 
 	def create_board
@@ -45,7 +45,7 @@ class Gameboard
 
 	def continue_placing_ship_horizontally(ship)
 		initial_spot = test_for_taken_spots(rand(99))
-		p "HI"
+		p "IN CONTINUE HORIZONTALLY"
 		spots_array = Array.new << initial_spot
 		p "spots_array before while statement: #{spots_array}"
 		forwards_increment = 1
@@ -81,7 +81,7 @@ class Gameboard
 
 	def continue_placing_ship_vertically(ship)
 		initial_spot = test_for_taken_spots(rand(99))
-		p "HI"
+		p "IN CONTINUE VERTICALLY"
 		spots_array = Array.new << initial_spot
 		p "spots_array before while statement: #{spots_array}"
 		forwards_increment = 10
