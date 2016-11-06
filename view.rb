@@ -37,12 +37,30 @@ class View
 	end
 
 	def get_user_shot
-		puts "\nENTER A COORDINATE CAPTAIN:"
+		puts "\nYOUR TURN,"
+		puts "ENTER A COORDINATE CAPTAIN:"
 		user_shot = gets.chomp.downcase
 	end
 
 	def notify_computers_turn
 		puts "\nCOMPUTER'S TURN:"
+		sleep(1)
+		puts "COMPUTER FIRING....."
+		sleep(1.5)
+	end
+
+	def hit_ship
+		system "clear"
+		5.times {puts "\n"}
+		puts "@@@ A SHIP WAS HIT @@@"
+		sleep(2)
+	end
+
+	def missed_ship
+		system "clear"
+		5.times {puts "\n"}
+		puts "--- NO SHIPS WERE HIT ---"
+		sleep(2)
 	end
 
 	def show_boards(user_gameboard, computer_gameboard)

@@ -6,7 +6,7 @@ class Ship
 	def initialize
 		@is_sunk = false
 		@times_hit = 0
-		@position
+		@position = []
 	end
 
 	def hit
