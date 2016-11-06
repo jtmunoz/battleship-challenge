@@ -119,11 +119,11 @@ class Gameboard
 	def position_ships
 		continue_placing_ship_horizontally(fleet.fleet_ships[:submarine1])
 		continue_placing_ship_horizontally(fleet.fleet_ships[:submarine2])
-		continue_placing_ship_horizontally(fleet.fleet_ships[:destroyer1])
-		continue_placing_ship_horizontally(fleet.fleet_ships[:destroyer2])
-		continue_placing_ship_horizontally(fleet.fleet_ships[:cruiser])
-		continue_placing_ship_horizontally(fleet.fleet_ships[:battleship])
-		continue_placing_ship_vertically(fleet.fleet_ships[:carrier])
+		rand(2) == 0 ? continue_placing_ship_horizontally(fleet.fleet_ships[:destroyer1]) : continue_placing_ship_vertically(fleet.fleet_ships[:destroyer1])
+		rand(2) == 0 ? continue_placing_ship_horizontally(fleet.fleet_ships[:destroyer2]) : continue_placing_ship_vertically(fleet.fleet_ships[:destroyer2])
+		rand(2) == 0 ? continue_placing_ship_horizontally(fleet.fleet_ships[:cruiser]) : continue_placing_ship_vertically(fleet.fleet_ships[:cruiser])
+		rand(2) == 0 ? continue_placing_ship_horizontally(fleet.fleet_ships[:battleship]) : continue_placing_ship_vertically(fleet.fleet_ships[:battleship])
+		rand(2) == 0 ? continue_placing_ship_horizontally(fleet.fleet_ships[:carrier]) : continue_placing_ship_vertically(fleet.fleet_ships[:carrier])
 	end
 
 	def show_hidden_board
