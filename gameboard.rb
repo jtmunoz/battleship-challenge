@@ -45,9 +45,9 @@ class Gameboard
 
 	def continue_placing_ship_horizontally(ship)
 		initial_spot = test_for_taken_spots(rand(99))
-		p "IN CONTINUE HORIZONTALLY"
+		# p "IN CONTINUE HORIZONTALLY"
 		spots_array = Array.new << initial_spot
-		p "spots_array before while statement: #{spots_array}"
+		# p "spots_array before while statement: #{spots_array}"
 		forwards_increment = 1
 		backwards_increment = 1
 		while spots_array.length < ship.size
@@ -61,29 +61,29 @@ class Gameboard
 				backwards_increment += 1
 			end
 		end
-		p "spots_array after while statement: #{spots_array}"
+		# p "spots_array after while statement: #{spots_array}"
 		@taken_positions.flatten! #flattening array so check can occur with numbers instead of other arrays
 		@taken_positions << spots_array
-		p "taken_positions #{@taken_positions.flatten} after flattening and spots_array #{spots_array} before check loop"
+		# p "taken_positions #{@taken_positions.flatten} after flattening and spots_array #{spots_array} before check loop"
 		spots_array.each do |spot|
 			if @taken_positions.include?(spot)
-				p true
+				# p true
 				@taken_positions.pop
 				continue_placing_ship_horizontally(ship)
-				p spots_array
+				# p spots_array
 			end
 		end
-		p "spots array after do #{spots_array}"
+		# p "spots array after do #{spots_array}"
 		ship.position = spots_array
-		p @taken_positions
+		# p @taken_positions
 		return spots_array
 	end
 
 	def continue_placing_ship_vertically(ship)
 		initial_spot = test_for_taken_spots(rand(99))
-		p "IN CONTINUE VERTICALLY"
+		# p "IN CONTINUE VERTICALLY"
 		spots_array = Array.new << initial_spot
-		p "spots_array before while statement: #{spots_array}"
+		# p "spots_array before while statement: #{spots_array}"
 		forwards_increment = 10
 		backwards_increment = 10
 		while spots_array.length < ship.size
@@ -97,22 +97,22 @@ class Gameboard
 				backwards_increment += 10
 			end
 		end
-		p "spots_array after while statement: #{spots_array}"
+		# p "spots_array after while statement: #{spots_array}"
 		@taken_positions.flatten! #flattening array so check can occur with numbers instead of other arrays
 		@taken_positions << spots_array
-		p "taken_positions #{@taken_positions.flatten} after flattening and spots_array #{spots_array} before check loop"
+		# p "taken_positions #{@taken_positions.flatten} after flattening and spots_array #{spots_array} before check loop"
 		spots_array.each do |spot|
 			if @taken_positions.include?(spot)
-				p true
+				# p true
 				@taken_positions.pop
 				continue_placing_ship_vertically(ship)
-				p spots_array
+				# p spots_array
 			end
 		end
-		p "spots array after do #{spots_array}"
+		# p "spots array after do #{spots_array}"
 		ship.position = spots_array
 		# @taken_positions << spots_array
-		p @taken_positions
+		# p @taken_positions
 		return spots_array
 	end
 
@@ -127,7 +127,15 @@ class Gameboard
 	end
 
 	def show_hidden_board
-		show_hidden_spots
+		# show_hidden_spots #shows hidden spots on board - use for debugging
+		puts "   A  B  C  D  E  F  G  H  I  J"
+		@hidden_board.each_with_index do |row, index|
+			puts "#{index}  #{row.join('  ')}"
+		end
+	end
+
+	def show_revealed_board
+		show_hidden_spots #shows hidden spots on board - use for debugging
 		puts "   A  B  C  D  E  F  G  H  I  J"
 		@hidden_board.each_with_index do |row, index|
 			puts "#{index}  #{row.join('  ')}"
