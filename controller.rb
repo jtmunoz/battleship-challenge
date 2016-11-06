@@ -82,11 +82,11 @@ class Controller
 					end
 				end
 			end
-			p computer_gameboard.taken_positions
+			# p computer_gameboard.taken_positions
 		else
 			computer_gameboard.miss(shot)
 			view.missed_ship
-			p computer_gameboard.taken_positions
+			# p computer_gameboard.taken_positions
 		end
 	end
 
@@ -116,14 +116,14 @@ class Controller
 					end
 				end
 			end
-			p user_gameboard.taken_positions
+			# p user_gameboard.taken_positions
 		else
 			user_gameboard.miss_shown_board(shot)
 			user_gameboard.miss(shot)
 			view.missed_ship
-			p user_gameboard.taken_positions
+			# p user_gameboard.taken_positions
 		end
-		p shot
+		# p shot
 	end
 
 	def convert_user_shot(coord_shot)
@@ -131,7 +131,7 @@ class Controller
 		ones_place = columns.index(coord_shot[0]).to_s
 		tens_place = coord_shot[1].to_s
 		number_shot = (tens_place + ones_place).to_i
-		p number_shot
+		# p number_shot
 		return number_shot
 	end
 

@@ -33,7 +33,15 @@ class View
 	def give_user_instructions
 		puts "\n\n\nPLEASE ENTER A COLUMN AND ROW IN THE FORM OF 'D7' \nIN ORDER TO SHOOT AT YOUR OPPONENT\n\n\n"
 		puts "GAME STARTING IN 5 SECONDS"
-		sleep(5)
+		sleep(1)
+		puts "4"
+		sleep(1)
+		puts "3"
+		sleep(1)
+		puts "2"
+		sleep(1)
+		puts "1..."
+		sleep(1)
 	end
 
 	def get_user_shot
