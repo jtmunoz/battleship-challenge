@@ -1,10 +1,10 @@
-class Battleship < Ship
+class Destroyer < Ship
 
 	attr_accessor :size
 
 	def initialize
 		super
-		@size = 4
+		@size = 2
 	end
 
 end
