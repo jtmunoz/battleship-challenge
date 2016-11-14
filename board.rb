@@ -1,7 +1,11 @@
 
 
-
-
+class Board
+# Your code here
+attr_accessor :board
+  def initialize
+    @board = []
+  end
 #creates a board
 def board_size
   board_array = Array.new
@@ -26,8 +30,8 @@ def board_rows
   end
 end
 
-def board
-  board_rows
+def game_board
+  @board =  board_rows
 end
 
 def integer(number)
@@ -37,7 +41,7 @@ def integer(number)
     when 10
       number.to_s
     else
-      number.to_s + " "
+    number.to_s + " "
   end
 end
 
@@ -58,11 +62,15 @@ def over_all_game_board
   both_boards_array = board * 2
 end
 
-board_visualization
+end
 
 
 
 
 
 
+
+#DRIVER CODE
+
+# board_size
 

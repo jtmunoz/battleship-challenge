@@ -4,6 +4,14 @@ class Ship
   attr_accessor :health
   def initialize
     @size = []
-    @health = size.length
+    @health = 0
+  end
+
+  def health
+    @health = self.size.length
+  end
+
+  def health=(health)
+    @health = health
   end
 end
